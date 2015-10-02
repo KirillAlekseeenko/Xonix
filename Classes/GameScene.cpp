@@ -24,6 +24,7 @@ float _swipeLength;
 const float _PI = 3.141592653589793238462643383279502884L;
 bool character_move = false;
 
+float margin = 0.5;
 
 
 
@@ -105,15 +106,11 @@ bool GameScene::initWithPhysics()
     SomeNode->setPhysicsBody(SomeBody);
     addChild(SomeNode);*/
     
-    auto topBorder = DrawNode::create();
+    /*auto topBorder = DrawNode::create();
     topBorder->setName("TOP");
     topBorder->setTag(-1);
     Vec2 topBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 2500), frameSize), RelativePosition::getPosition(Vec2(0, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 2500), frameSize)};
     topBorder->drawSolidPoly(topBorderVecArr, 4, Color4F(1.0f,0.0f,0.0f,1.0f));
-    auto topBorderbody = PhysicsBody::createPolygon(topBorderVecArr, 4, PhysicsMaterial(100.0f, 0, 0.0f));
-    topBorderbody->setContactTestBitmask(true);
-    topBorderbody->setDynamic(false);
-    topBorder->setPhysicsBody(topBorderbody);
     topBorder->setPosition(Vec2(0, 0));
     addChild(topBorder);
     
@@ -124,10 +121,6 @@ bool GameScene::initWithPhysics()
     lowBorder->setTag(-3);
     Vec2 lowBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 500), frameSize), RelativePosition::getPosition(Vec2(4000, 500), frameSize), RelativePosition::getPosition(Vec2(4000, 0), frameSize), RelativePosition::getPosition(Vec2(0, 0), frameSize)};
     lowBorder->drawSolidPoly(lowBorderVecArr, 4, Color4F(1.0f,0.0f,0.0f,1.0f));
-    auto lowBorderbody = PhysicsBody::createPolygon(lowBorderVecArr, 4, PhysicsMaterial(100.0f, 0, 0.0f));
-    lowBorderbody->setContactTestBitmask(true);
-    lowBorderbody->setDynamic(false);
-    lowBorder->setPhysicsBody(lowBorderbody);
     lowBorder->setPosition(Vec2(0, 0));
     addChild(lowBorder);
 
@@ -138,10 +131,6 @@ bool GameScene::initWithPhysics()
     leftBorder->setTag(-4);
     Vec2 leftBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 500), frameSize), RelativePosition::getPosition(Vec2(0, 500), frameSize)};
     leftBorder->drawSolidPoly(leftBorderVecArr, 4,  Color4F(1.0f,0.0f,0.0f,1.0f));
-    auto leftBorderbody = PhysicsBody::createPolygon(leftBorderVecArr, 4, PhysicsMaterial(100.0f, 0, 0.0f));
-    leftBorderbody->setContactTestBitmask(true);
-    leftBorderbody->setDynamic(false);
-    leftBorder->setPhysicsBody(leftBorderbody);
     leftBorder->setPosition(Vec2(0, 0));
     addChild(leftBorder);
 
@@ -151,26 +140,32 @@ bool GameScene::initWithPhysics()
     rightBorder->setTag(-2);
     Vec2 rightBorderVecArr[4] = {RelativePosition::getPosition(Vec2(3500, 2500), frameSize), RelativePosition::getPosition(Vec2(4000, 2500), frameSize), RelativePosition::getPosition(Vec2(4000, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 500), frameSize)};
     rightBorder->drawSolidPoly(rightBorderVecArr, 4,  Color4F(1.0f,0.0f,0.0f,1.0f));
-    auto rightBorderbody = PhysicsBody::createPolygon(rightBorderVecArr, 4, PhysicsMaterial(100.0f, 0, 0.0f));
-    rightBorderbody->setContactTestBitmask(true);
-    rightBorderbody->setDynamic(false);
-    rightBorder->setPhysicsBody(rightBorderbody);
     rightBorder->setPosition(Vec2(0, 0));
     addChild(rightBorder);
-    auto Shapes = rightBorderbody->getShapes();
-    std::cout<<"Shapes"<<endl;
-    for(int i = 0;i < Shapes.size();i++)
-    {
-        std::cout<<i<<". "<<Shapes.at(i)->getArea()<<endl;
-    }
+     */
     
-    Vec2 StartPoly[4] = {RelativePosition::getPosition(Vec2(500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 2500), frameSize)};
+    Vec2 StartPoly[5] = {RelativePosition::getPosition(Vec2(500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 2500), frameSize) };
     
     mainPolygon.addPoint(StartPoly[3]);
     mainPolygon.addPoint(StartPoly[2]);
     mainPolygon.addPoint(StartPoly[1]);
     mainPolygon.addPoint(StartPoly[0]);
-
+    
+    
+    for(int i = 0;i < 4;i++)
+    {
+        auto vv = (StartPoly[i+1] - StartPoly[i]).getNormalized();
+        auto node = cocos2d::Node::create();
+        node->setTag(i);
+        physicsStack.push(i);
+        auto body = PhysicsBody::createEdgeSegment(StartPoly[i] + vv * margin, StartPoly[i+1] - vv * margin);
+        body->setTag(i);
+        body->setDynamic(false);
+        body->setContactTestBitmask(true);
+        node->setPhysicsBody(body);
+        addChild(node);
+        std::cout<<"added "<< i<<endl;
+    }
     
     createPolygon_ = false;
     
@@ -183,7 +178,7 @@ bool GameScene::initWithPhysics()
     //character = Sprite::create("Character.png");
     character->setPosition(RelativePosition::getPosition(Vec2(2000, 500), frameSize));
     //auto cbody = PhysicsBody::createBox(RelativePosition::getSize(Size(2,2), frameSize),PhysicsMaterial(100.0f, 0, 0.0f));
-    auto cbody = PhysicsBody::createCircle(4, PhysicsMaterial(100.0f, 0, 0.0f));
+    auto cbody = PhysicsBody::createCircle(1, PhysicsMaterial(100.0f, 0, 0.0f));
     cbody->setContactTestBitmask(true);
     cbody->setDynamic(true);
     cbody->setRotationEnable(false);
@@ -198,7 +193,7 @@ bool GameScene::initWithPhysics()
     {
         auto nodeA = contact.getShapeA()->getBody()->getNode();
         auto nodeB = contact.getShapeB()->getBody()->getNode();
-        
+        std::cout<<nodeB->getTag()<<endl;
         
         std::cout<<"CONTACT: "<<nodeA->getName()<<" AND "<<nodeB->getName()<<" "<<CollisionDots::getCurrentCollision().empty()<<std::endl;
         std::cout<<"ContactData: "<<"count - "<<contact.getContactData()->count<<", normal - ("<<contact.getContactData()->normal.x<<","<<contact.getContactData()->normal.y<<"), "<<"points - ("<<contact.getContactData()->points[0].x<<", "<<contact.getContactData()->points[0].y<<")   ,("<<contact.getContactData()->points[1].x<<", "<<contact.getContactData()->points[1].y<<")   "<<"NodePosition: ("<<nodeA->getPositionX()<<", "<<nodeA->getPositionY()<<")  ("<<nodeB->getPositionX()<<", "<<nodeB->getPositionY()<<")"<<std::endl;
@@ -239,14 +234,14 @@ bool GameScene::initWithPhysics()
                     std::cout<<(*i).x<<" "<<(*i).y<<"<->";
                 }
                 
-                
+                std::vector<Vec2> mainList;
                 
                 auto node = DrawNode::create();
                 
                 std::vector<Vec2> polygon;
                 
                 try{
-                    polygon = mainPolygon.getPath(SecList);
+                    polygon = mainPolygon.getPath(SecList, mainList);
                     
                 }
                 catch(BeginEndException)
@@ -279,7 +274,7 @@ bool GameScene::initWithPhysics()
                 
                 std::cout<<"Indices: ";
                 
-                for(int i = 0;i < indices.size();i+=3)
+                /*for(int i = 0;i < indices.size();i+=3)
                 {
                     std::cout<<"("<<polygon[indices[i]].x<<", "<<polygon[indices[i]].y<<") <->";
                     std::cout<<"("<<polygon[indices[i+1]].x<<", "<<polygon[indices[i+1]].y<<") <->";
@@ -287,41 +282,46 @@ bool GameScene::initWithPhysics()
                     std::cout<<" ***** ";
                     node->drawTriangle(polygon[indices[i]], polygon[indices[i+1]], polygon[indices[i+2]], Color4F::GREEN);
                     
-                }
-                Vec2 *polygon_ = new Vec2[polygon.size()];
+                }*/
+                /*Vec2 *polygon_ = new Vec2[polygon.size()];
                 int ii = 0;
                 for(auto x : polygon)
                 {
                     polygon_[ii] = x;
                     ii++;
                 }
-                auto body = PhysicsBody::createPolygon(polygon_, polygon.size(), PhysicsMaterial(100.0f, 0, 0.0f));
-                body->setContactTestBitmask(true);
-                body->setDynamic(false);
-            
-                node->setPhysicsBody(body);
-                
-                node->setName("NewShape");
+                auto body = PhysicsBody::createPolygon(polygon_, polygon.size(), PhysicsMaterial(100.0f, 0, 0.0f));*/
                 
                 character_move = true;
                 
+                character->getPhysicsBody()->setContactTestBitmask(false);
                 
-                
-                this->update(1.0);
+                this->update(0.001);
                 
                 character_move = false;
                 
-                std::cout<<"\nUPDATE2\n";
                 
-                                
-                this->addChild(node);
+                
+                for(int i = 0;i < mainList.size() - 1;i++)
+                {
+                    auto vv = (mainList[i+1] - mainList[i]).getNormalized();
+                    auto node = cocos2d::Node::create();
+                    node->setTag(i);
+                    physicsStack.push(i);
+                    auto body = PhysicsBody::createEdgeSegment(mainList[i] + vv * margin, mainList[i+1] - vv * margin);
+                    body->setDynamic(false);
+                    body->setContactTestBitmask(true);
+                    node->setPhysicsBody(body);
+                    addChild(node);
+                    std::cout<<"added "<< i<<endl;
+                }
+                
+                _gameBegun = false;
 
+                character->getPhysicsBody()->setContactTestBitmask(true);
                 
-                std::cout<<endl;
                 
-                SecList.clear();
-                
-                delete [] polygon_;
+                return true;
                 
                 
             }
@@ -344,8 +344,11 @@ bool GameScene::initWithPhysics()
     
     contactListener->onContactSeperate = [this](PhysicsContact& contact)
     {
+        if(!_gameBegun)
+            return;
         auto nodeA = contact.getShapeA()->getBody()->getNode();
         auto nodeB = contact.getShapeB()->getBody()->getNode();
+        std::cout<<nodeB->getTag()<<endl;
         std::cout<<"SEPARATE: "<<nodeA->getName()<<" AND "<<nodeB->getName()<<std::endl;
         std::cout<<"ContactData: "<<"count - "<<contact.getContactData()->count<<", normal - ("<<contact.getContactData()->normal.x<<","<<contact.getContactData()->normal.y<<"), "<<"points - ("<<contact.getContactData()->points[0].x<<", "<<contact.getContactData()->points[0].y<<")   ,("<<contact.getContactData()->points[1].x<<", "<<contact.getContactData()->points[1].y<<")   "<<"NodePosition: ("<<nodeA->getPositionX()<<", "<<nodeA->getPositionY()<<")  ("<<nodeB->getPositionX()<<", "<<nodeB->getPositionY()<<")"<<std::endl;
         
@@ -435,6 +438,14 @@ void GameScene::update(float dt)
     if(character_move)
     {
         this->character->getPhysicsBody()->setVelocity(Vec2(0, 300));
+        while(!physicsStack.empty())
+        {
+            auto nn = this->getChildByTag(physicsStack.top());
+            nn->removeFromPhysicsWorld();
+            std::cout<<"deleted "<< nn->getTag()<<endl;
+            physicsStack.pop();
+            
+        }
     }
     _time++;
     if(_isDrawing && (_time >= 5))

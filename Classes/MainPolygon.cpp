@@ -110,6 +110,7 @@ void MainPolygon::addEndPoint(cocos2d::Vec2 &ePoint, const cocos2d::Vec2& normal
         if(isEqual(p->data.x, ePoint.x) && isEqual(p->next->data.x, ePoint.x) &&
            ((p->data.y < ePoint.y && p->next->data.y > ePoint.y ) || (p->data.y > ePoint.y &&  p->next->data.y < ePoint.y)))
         {
+            ePoint.x = p->data.x;
             endPoint = mainList.insert(p->next, ePoint);
             
             break;
@@ -117,6 +118,7 @@ void MainPolygon::addEndPoint(cocos2d::Vec2 &ePoint, const cocos2d::Vec2& normal
         if(isEqual(p->data.y, ePoint.y) && isEqual(p->next->data.y, ePoint.y) &&
            ((p->data.x < ePoint.x && p->next->data.x > ePoint.x ) || (p->data.x > ePoint.x &&  p->next->data.x < ePoint.x)))
         {
+            ePoint.y = p->data.y;
             endPoint = mainList.insert(p->next, ePoint);
             break;
         }
@@ -127,7 +129,7 @@ void MainPolygon::addEndPoint(cocos2d::Vec2 &ePoint, const cocos2d::Vec2& normal
     
 }
 
-std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>& newPoints)
+std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>& newPoints, std::vector<cocos2d::Vec2> &List)
 {
     cocos2d::Vec2 newPoints_begin = cocos2d::Vec2::ZERO;
     cocos2d::Vec2 newPoints_end = cocos2d::Vec2::ZERO;
@@ -339,6 +341,13 @@ std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>
     
     //////////////////////////
     
+    Unit* p = mainList.begin();
+    do
+    {
+        List.push_back(p->data);
+        p = p->next;
+    }while(p != mainList.begin());
+    List.push_back(p->data);
     
     return newPolygon;
     

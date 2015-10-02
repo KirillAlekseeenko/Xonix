@@ -20,6 +20,7 @@
 #include <cmath>
 #include "MainPolygon.h"
 #include "MyDrawNode.hpp"
+#include <stack>
 
 class GameScene : public cocos2d::Scene
 {
@@ -49,6 +50,9 @@ class GameScene : public cocos2d::Scene
     //Vec2 *polygon_;
     
     bool createPolygon_;
+    
+    
+    std::stack<int> physicsStack;
     
     
     
