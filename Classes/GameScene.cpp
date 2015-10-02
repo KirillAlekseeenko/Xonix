@@ -24,7 +24,7 @@ float _swipeLength;
 const float _PI = 3.141592653589793238462643383279502884L;
 bool character_move = false;
 
-float margin = 0.5;
+float margin = 1;
 
 
 
@@ -259,6 +259,11 @@ bool GameScene::initWithPhysics()
                 
                 mainPolygon.printPoints();
                 
+                std::cout<<"\nmainList: ";
+                for(auto x : mainList)
+                {
+                    std::cout<<"("<<x.x<<", "<<x.y<<") ";
+                }
                 
                 std::vector<int> indices;
                 
@@ -320,6 +325,7 @@ bool GameScene::initWithPhysics()
 
                 character->getPhysicsBody()->setContactTestBitmask(true);
                 
+                SecList.clear();
                 
                 return true;
                 
@@ -441,8 +447,9 @@ void GameScene::update(float dt)
         while(!physicsStack.empty())
         {
             auto nn = this->getChildByTag(physicsStack.top());
-            nn->removeFromPhysicsWorld();
             std::cout<<"deleted "<< nn->getTag()<<endl;
+            nn->removeFromParent();
+            
             physicsStack.pop();
             
         }

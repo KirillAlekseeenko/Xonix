@@ -9,6 +9,14 @@
 #include "ArcList.h"
 
 
+bool isEqual(float x, float y)
+{
+    float preciseness = 4;
+    if(std::abs(x - y) < preciseness)
+        return true;
+    else
+        return false;
+}
 CircularList::~CircularList()
 {
     Unit *p = this->_end;
@@ -149,5 +157,41 @@ Unit* CircularList::find(const cocos2d::Vec2& data)
         p = p->next;
     }while(p!=_begin);
     return nullptr;
+}
+
+void CircularList::make_straight()
+{
+    auto ptr = _begin;
+    do
+    {
+        auto ptr_next = ptr->next;
+        auto ptr_prev = ptr->prev;
+        if(isEqual(ptr_prev->data.x, ptr->data.x) && isEqual(ptr_next->data.x, ptr->data.x))
+        {
+            this->erase(ptr);
+        }
+        if(isEqual(ptr_prev->data.y, ptr->data.y) && isEqual(ptr_next->data.y, ptr->data.y))
+        {
+            this->erase(ptr);
+        }
+        ptr = ptr_next;
+    }while(ptr != _begin);
+    
+    ptr = _begin;
+    
+    do
+    {
+        auto ptr_next = ptr->next;
+        auto ptr_prev = ptr->prev;
+        if(isEqual(ptr_next->data.x, ptr->data.x))
+        {
+            ptr->data.x = ptr_next->data.x;
+        }
+        if(isEqual(ptr_next->data.y, ptr->data.y))
+        {
+            ptr->data.y = ptr_next->data.y;
+        }
+        ptr = ptr_next;
+    }while(ptr != _begin);
 }
 

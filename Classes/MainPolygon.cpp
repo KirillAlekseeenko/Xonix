@@ -10,21 +10,14 @@
 
 
 const float _PI = 3.141592653589793238462643383279502884L;
-const float margin = 4;
+const float margin = 3;
 
 
 
 
 
 
-bool isEqual(float x, float y)
-{
-    float preciseness = 8;
-    if(std::abs(x - y) < preciseness)
-        return true;
-    else
-        return false;
-}
+
 
 
 float getSquare(std::vector<cocos2d::Vec2> arr)
@@ -334,14 +327,32 @@ std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>
         }while(p != mainList.begin());
     }*/
     
+    std::cout<<"BeforeMakingStraight: ";
+    
+    std::cout<<"\nPoints: ";
+    
+    auto ptr = mainList.begin();
+    do{
+        std::cout<<"("<<ptr->data.x<<", "<<ptr->data.y<<") ";
+        ptr = ptr->next;
+    }while(ptr != mainList.begin());
+    
+    std::cout<<std::endl;
+    
+    mainList.make_straight();
     
     
     beginPoint = nullptr;
     endPoint = nullptr;
     
+    
+
+    
+    
+    
     //////////////////////////
     
-    Unit* p = mainList.begin();
+    auto p = mainList.begin();
     do
     {
         List.push_back(p->data);
