@@ -22,6 +22,7 @@ int _time = 0;
 float _speed = 100;
 float _swipeLength;
 const float _PI = 3.141592653589793238462643383279502884L;
+bool removing_objects = false;
 bool character_move = false;
 
 float margin = 1;
@@ -240,8 +241,9 @@ bool GameScene::initWithPhysics()
                 
                 std::vector<Vec2> polygon;
                 
+                
                 try{
-                    polygon = mainPolygon.getPath(SecList, mainList);
+                    polygon = mainPolygon.getPath(SecList, mainList, this->direction);
                     
                 }
                 catch(BeginEndException)
@@ -297,13 +299,13 @@ bool GameScene::initWithPhysics()
                 }
                 auto body = PhysicsBody::createPolygon(polygon_, polygon.size(), PhysicsMaterial(100.0f, 0, 0.0f));*/
                 
-                character_move = true;
+                removing_objects = true;
                 
                 character->getPhysicsBody()->setContactTestBitmask(false);
                 
                 this->update(0.001);
                 
-                character_move = false;
+                removing_objects = false;
                 
                 
                 
@@ -326,6 +328,8 @@ bool GameScene::initWithPhysics()
                 character->getPhysicsBody()->setContactTestBitmask(true);
                 
                 SecList.clear();
+                
+                character_move = true;
                 
                 return true;
                 
@@ -441,9 +445,11 @@ bool GameScene::initWithPhysics()
 
 void GameScene::update(float dt)
 {
-    if(character_move)
+    if(removing_objects)
     {
-        this->character->getPhysicsBody()->setVelocity(Vec2(0, 300));
+        //this->character->getPhysicsBody()->setVelocity(Vec2(0, 3));
+        
+        std::cout<<"\nDIRECTION: ("<<this->direction.x<<", "<<this->direction.y<<")\n";
         while(!physicsStack.empty())
         {
             auto nn = this->getChildByTag(physicsStack.top());
@@ -453,6 +459,11 @@ void GameScene::update(float dt)
             physicsStack.pop();
             
         }
+    }
+    if(character_move)
+    {
+        this->character->setPosition(this->character->getPosition() + this->direction);
+        character_move = false;
     }
     _time++;
     if(_isDrawing && (_time >= 5))

@@ -51,6 +51,8 @@ class GameScene : public cocos2d::Scene
     
     bool createPolygon_;
     
+    cocos2d::Vec2 direction;
+    
     
     std::stack<int> physicsStack;
     

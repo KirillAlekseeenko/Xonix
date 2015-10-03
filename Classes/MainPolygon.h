@@ -86,7 +86,7 @@ public:
     void addPoint(const cocos2d::Vec2 &Point);
     void addBeginPoint(cocos2d::Vec2 &bPoint, const cocos2d::Vec2& normal);
     void addEndPoint(cocos2d::Vec2 &ePoint, const cocos2d::Vec2& normal);
-    std::vector<cocos2d::Vec2> getPath(const std::vector<cocos2d::Vec2>& newPoints, std::vector<cocos2d::Vec2> &List);
+    std::vector<cocos2d::Vec2> getPath(const std::vector<cocos2d::Vec2>& newPoints, std::vector<cocos2d::Vec2> &List, cocos2d::Vec2 &direction);
     // where newPoints - path from beginPoint to endPoint
     //return vector - new polygon, that will be created later
     

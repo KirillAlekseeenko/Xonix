@@ -10,7 +10,7 @@
 
 
 const float _PI = 3.141592653589793238462643383279502884L;
-const float margin = 3;
+const float margin = 1;
 
 
 
@@ -122,7 +122,7 @@ void MainPolygon::addEndPoint(cocos2d::Vec2 &ePoint, const cocos2d::Vec2& normal
     
 }
 
-std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>& newPoints, std::vector<cocos2d::Vec2> &List)
+std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>& newPoints, std::vector<cocos2d::Vec2> &List, cocos2d::Vec2 &direction)
 {
     cocos2d::Vec2 newPoints_begin = cocos2d::Vec2::ZERO;
     cocos2d::Vec2 newPoints_end = cocos2d::Vec2::ZERO;
@@ -195,7 +195,7 @@ std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>
     }
     
     
-    if(clockwise)
+    if(!clockwise)
     {
         normalEnd.rotate(cocos2d::Vec2::ZERO, _PI/2.0);
         normalBegin.rotate(cocos2d::Vec2::ZERO, _PI/2.0);
@@ -359,6 +359,9 @@ std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>
         p = p->next;
     }while(p != mainList.begin());
     List.push_back(p->data);
+    
+    direction = normalEnd * margin;
+    
     
     return newPolygon;
     
