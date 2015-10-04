@@ -27,6 +27,8 @@ class GameScene : public cocos2d::Scene
     bool _gameBegun;
     
     DrawNode *character;
+    std::vector<DrawNode*> enemies;
+    
     cocos2d::RenderTexture *canvas;
     
     std::vector<Vec2> SecList;
@@ -36,25 +38,23 @@ class GameScene : public cocos2d::Scene
     
     
     
-    //std::vector<Vec2> polygon;
-    //std::vector<int> indices;
-    //Vec2 *polygon_;
     bool PreSolve_;
     bool ContactBegin_;
     
     float startArea;
     float currentArea;
     
-    //std::vector<int> indices;
-    //std::vector<Vec2> polygon;
-    //Vec2 *polygon_;
-    
+        
     bool createPolygon_;
     
     cocos2d::Vec2 direction;
     
     
     std::stack<int> physicsStack;
+    
+    std::vector<cocos2d::Node*> lineList;
+    cocos2d::Node *currentLine;
+    cocos2d::Vec2 lastPoint;
     
     
     

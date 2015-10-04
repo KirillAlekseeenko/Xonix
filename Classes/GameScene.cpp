@@ -24,6 +24,7 @@ float _swipeLength;
 const float _PI = 3.141592653589793238462643383279502884L;
 bool removing_objects = false;
 bool character_move = false;
+float rect_margin = 1;
 
 float margin = 1;
 
@@ -67,6 +68,7 @@ bool GameScene::initWithPhysics()
         return false;
     }
     
+    this->currentLine = nullptr;
     
     this->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
     
@@ -107,7 +109,7 @@ bool GameScene::initWithPhysics()
     SomeNode->setPhysicsBody(SomeBody);
     addChild(SomeNode);*/
     
-    /*auto topBorder = DrawNode::create();
+    auto topBorder = DrawNode::create();
     topBorder->setName("TOP");
     topBorder->setTag(-1);
     Vec2 topBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 2500), frameSize), RelativePosition::getPosition(Vec2(0, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 2500), frameSize)};
@@ -143,7 +145,7 @@ bool GameScene::initWithPhysics()
     rightBorder->drawSolidPoly(rightBorderVecArr, 4,  Color4F(1.0f,0.0f,0.0f,1.0f));
     rightBorder->setPosition(Vec2(0, 0));
     addChild(rightBorder);
-     */
+    
     
     Vec2 StartPoly[5] = {RelativePosition::getPosition(Vec2(500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 2500), frameSize) };
     
@@ -187,9 +189,23 @@ bool GameScene::initWithPhysics()
     character->setName("Character");
     addChild(character);
     
-    
+    auto enemy = DrawNode::create();
+    enemy->setName("Enemy");
+    enemy->drawSolidRect(RelativePosition::getSize(Vec2(-50, -50), frameSize), RelativePosition::getSize(Vec2(50,50),frameSize),Color4F(0.0f,0.0f,1.0f,1.0f));
+    auto ebody = PhysicsBody::createCircle(1, PhysicsMaterial(0.0f, 2, 0.0f));
+    ebody->setDynamic(true);
+    ebody->setContactTestBitmask(true);
+    ebody->setRotationEnable(false);
+    enemy->setPhysicsBody(ebody);
+    enemy->setPosition(Vec2(origin.x+visibleSize.width/2, origin.y+visibleSize.height/2));
+    addChild(enemy);
+    enemy->getPhysicsBody()->setVelocity(Vec2(100, 100));
     
     auto contactListener = EventListenerPhysicsContact::create();
+    
+    
+    
+    
     contactListener->onContactBegin = [this, frameSize](PhysicsContact& contact)
     {
         auto nodeA = contact.getShapeA()->getBody()->getNode();
@@ -199,143 +215,173 @@ bool GameScene::initWithPhysics()
         std::cout<<"CONTACT: "<<nodeA->getName()<<" AND "<<nodeB->getName()<<" "<<CollisionDots::getCurrentCollision().empty()<<std::endl;
         std::cout<<"ContactData: "<<"count - "<<contact.getContactData()->count<<", normal - ("<<contact.getContactData()->normal.x<<","<<contact.getContactData()->normal.y<<"), "<<"points - ("<<contact.getContactData()->points[0].x<<", "<<contact.getContactData()->points[0].y<<")   ,("<<contact.getContactData()->points[1].x<<", "<<contact.getContactData()->points[1].y<<")   "<<"NodePosition: ("<<nodeA->getPositionX()<<", "<<nodeA->getPositionY()<<")  ("<<nodeB->getPositionX()<<", "<<nodeB->getPositionY()<<")"<<std::endl;
         
-
-        if(CollisionDots::getCurrentCollision().empty() && _gameBegun)
+        if((nodeA->getName() == "Enemy" && nodeB->getName() == "Line") || (nodeB->getName() == "Enemy" && nodeA->getName() == "Line"))
         {
-            
-            //this->removeChildByTag(10);
-            
-            if(nodeA->getName() == "Character" || nodeB->getName() == "Character")
-            {
-                Vec2 contactPoint;
-                
-                
-                if(contact.getContactData()->count == 1)
-                {
-                    contactPoint = contact.getContactData()->points[0];
-                }
-                else
-                {
-                    contactPoint = (contact.getContactData()->points[0] + contact.getContactData()->points[1])/2.0;
-                }
-                
-                
-                
-                _isDrawing = false;
-                this->canvas->clear(0, 0, 0, 0);
-                
-                mainPolygon.addEndPoint(contactPoint, contact.getContactData()->normal);
-                
-                mainPolygon.printPoints();
-                
-                
-                std::cout<<"SecList"<<endl;
-                for(auto i = SecList.begin();i!=SecList.end();i++)
-                {
-                    std::cout<<(*i).x<<" "<<(*i).y<<"<->";
-                }
-                
-                std::vector<Vec2> mainList;
-                
-                auto node = DrawNode::create();
-                
-                std::vector<Vec2> polygon;
-                
-                
-                try{
-                    polygon = mainPolygon.getPath(SecList, mainList, this->direction);
-                    
-                }
-                catch(BeginEndException)
-                {
-                    MessageBox("Error", "BeginEndError");
-                    cout<<"BeginEndError";
-                    return false;
-                }
-                std::cout<<"\nPolygonBeforeTriagonalization: ";
-                for(auto x : polygon)
-                {
-                    std::cout<<"("<<x.x<<", "<<x.y<<") ";
-                }
-                std::cout<<std::endl;
-                
-                mainPolygon.printPoints();
-                
-                std::cout<<"\nmainList: ";
-                for(auto x : mainList)
-                {
-                    std::cout<<"("<<x.x<<", "<<x.y<<") ";
-                }
-                
-                std::vector<int> indices;
-                
-                indices = math::triangulate<int>(polygon);
-                
-                
-                std::cout<<"\nPolygonAfterTriagonalization: ";
-                for(auto x : polygon)
-                {
-                    std::cout<<"("<<x.x<<", "<<x.y<<") ";
-                }
-                std::cout<<std::endl;
-                
-                std::cout<<"Indices: ";
-                
-                /*for(int i = 0;i < indices.size();i+=3)
-                {
-                    std::cout<<"("<<polygon[indices[i]].x<<", "<<polygon[indices[i]].y<<") <->";
-                    std::cout<<"("<<polygon[indices[i+1]].x<<", "<<polygon[indices[i+1]].y<<") <->";
-                    std::cout<<"("<<polygon[indices[i+2]].x<<", "<<polygon[indices[i+2]].y<<") <->";
-                    std::cout<<" ***** ";
-                    node->drawTriangle(polygon[indices[i]], polygon[indices[i+1]], polygon[indices[i+2]], Color4F::GREEN);
-                    
-                }*/
-                /*Vec2 *polygon_ = new Vec2[polygon.size()];
-                int ii = 0;
-                for(auto x : polygon)
-                {
-                    polygon_[ii] = x;
-                    ii++;
-                }
-                auto body = PhysicsBody::createPolygon(polygon_, polygon.size(), PhysicsMaterial(100.0f, 0, 0.0f));*/
-                
-                removing_objects = true;
-                
-                character->getPhysicsBody()->setContactTestBitmask(false);
-                
-                this->update(0.001);
-                
-                removing_objects = false;
-                
-                
-                
-                for(int i = 0;i < mainList.size() - 1;i++)
-                {
-                    auto vv = (mainList[i+1] - mainList[i]).getNormalized();
-                    auto node = cocos2d::Node::create();
-                    node->setTag(i);
-                    physicsStack.push(i);
-                    auto body = PhysicsBody::createEdgeSegment(mainList[i] + vv * margin, mainList[i+1] - vv * margin);
-                    body->setDynamic(false);
-                    body->setContactTestBitmask(true);
-                    node->setPhysicsBody(body);
-                    addChild(node);
-                    std::cout<<"added "<< i<<endl;
-                }
-                
-                _gameBegun = false;
-
-                character->getPhysicsBody()->setContactTestBitmask(true);
-                
-                SecList.clear();
-                
-                character_move = true;
-                
-                return true;
-                
-                
-            }
+            MessageBox("","GAGARIN HUY!");
+            Director::getInstance()->stopAnimation();
+            return true;
         }
+        
+        if(nodeA->getName() == "Line" || nodeB->getName() == "Line")
+        {
+            return true;
+        }
+        if(nodeA->getName() == "Enemy" || nodeB->getName() == "Enemy")
+        {
+            return true;
+        }
+            
+
+            if(CollisionDots::getCurrentCollision().empty() && _gameBegun)
+            {
+                
+                
+                if(nodeA->getName() == "Character" || nodeB->getName() == "Character")
+                {
+                    Vec2 contactPoint;
+                    
+                    
+                    if(contact.getContactData()->count == 1)
+                    {
+                        contactPoint = contact.getContactData()->points[0];
+                    }
+                    else
+                    {
+                        contactPoint = (contact.getContactData()->points[0] + contact.getContactData()->points[1])/2.0;
+                    }
+                    
+                    
+                    
+                    _isDrawing = false;
+                    this->canvas->clear(0, 0, 0, 0);
+                    
+                    mainPolygon.addEndPoint(contactPoint, contact.getContactData()->normal);
+                    
+                    mainPolygon.printPoints();
+                    
+                    
+                    std::cout<<"SecList"<<endl;
+                    for(auto i = SecList.begin();i!=SecList.end();i++)
+                    {
+                        std::cout<<(*i).x<<" "<<(*i).y<<"<->";
+                    }
+                    
+                    std::vector<Vec2> mainList;
+                    
+                    auto node = DrawNode::create();
+                    
+                    std::vector<Vec2> polygon;
+                    
+                    
+                    try{
+                        polygon = mainPolygon.getPath(SecList, mainList, this->direction);
+                        
+                    }
+                    catch(BeginEndException)
+                    {
+                        MessageBox("Error", "BeginEndError");
+                        cout<<"BeginEndError";
+                        return false;
+                    }
+                    std::cout<<"\nPolygonBeforeTriagonalization: ";
+                    for(auto x : polygon)
+                    {
+                        std::cout<<"("<<x.x<<", "<<x.y<<") ";
+                    }
+                    std::cout<<std::endl;
+                    
+                    mainPolygon.printPoints();
+                    
+                    std::cout<<"\nmainList: ";
+                    for(auto x : mainList)
+                    {
+                        std::cout<<"("<<x.x<<", "<<x.y<<") ";
+                    }
+                    
+                    std::vector<int> indices;
+                    
+                    indices = math::triangulate<int>(polygon);
+                    
+                    
+                    std::cout<<"\nPolygonAfterTriagonalization: ";
+                    for(auto x : polygon)
+                    {
+                        std::cout<<"("<<x.x<<", "<<x.y<<") ";
+                    }
+                    std::cout<<std::endl;
+                    
+                    std::cout<<"Indices: ";
+                    
+                    for(int i = 0;i < indices.size();i+=3)
+                    {
+                        std::cout<<"("<<polygon[indices[i]].x<<", "<<polygon[indices[i]].y<<") <->";
+                        std::cout<<"("<<polygon[indices[i+1]].x<<", "<<polygon[indices[i+1]].y<<") <->";
+                        std::cout<<"("<<polygon[indices[i+2]].x<<", "<<polygon[indices[i+2]].y<<") <->";
+                        std::cout<<" ***** ";
+                        node->drawTriangle(polygon[indices[i]], polygon[indices[i+1]], polygon[indices[i+2]], Color4F::GREEN);
+                        
+                    }
+                    
+                    /*Vec2 *polygon_ = new Vec2[polygon.size()];
+                    int ii = 0;
+                    for(auto x : polygon)
+                    {
+                        polygon_[ii] = x;
+                        ii++;
+                    }
+                    auto body = PhysicsBody::createPolygon(polygon_, polygon.size(), PhysicsMaterial(100.0f, 0, 0.0f));*/
+                    
+                    removing_objects = true;
+                    
+                    
+                    character->getPhysicsBody()->setContactTestBitmask(false);
+                    
+                    this->update(0.001);
+                    
+                    removing_objects = false;
+                    
+                    
+                    
+                    for(int i = 0;i < mainList.size() - 1;i++)
+                    {
+                        auto vv = (mainList[i+1] - mainList[i]).getNormalized();
+                        auto node = cocos2d::Node::create();
+                        node->setTag(i);
+                        physicsStack.push(i);
+                        auto body = PhysicsBody::createEdgeSegment(mainList[i] + vv * margin, mainList[i+1] - vv * margin);
+                        body->setDynamic(false);
+                        body->setContactTestBitmask(true);
+                        node->setPhysicsBody(body);
+                        addChild(node);
+                        std::cout<<"added "<< i<<endl;
+                    }
+                    
+                    _gameBegun = false;
+
+                    character->getPhysicsBody()->setContactTestBitmask(true);
+                    
+                    SecList.clear();
+                    
+                    character_move = true;
+                    
+                    std::cout<<"\nLINELIST_SIZE = "<<lineList.size()<<endl;
+                    
+                    for(auto x : lineList)
+                    {
+                        x->removeFromParent();
+                    }
+                    lineList.clear();
+                    
+                    this->currentLine->removeFromParent();
+                    currentLine = nullptr;
+                    
+                    addChild(node);
+                    
+                    return true;
+                    
+                    
+                }
+            }
         if(!_gameBegun)
         {
             _gameBegun = true;
@@ -362,6 +408,15 @@ bool GameScene::initWithPhysics()
         std::cout<<"SEPARATE: "<<nodeA->getName()<<" AND "<<nodeB->getName()<<std::endl;
         std::cout<<"ContactData: "<<"count - "<<contact.getContactData()->count<<", normal - ("<<contact.getContactData()->normal.x<<","<<contact.getContactData()->normal.y<<"), "<<"points - ("<<contact.getContactData()->points[0].x<<", "<<contact.getContactData()->points[0].y<<")   ,("<<contact.getContactData()->points[1].x<<", "<<contact.getContactData()->points[1].y<<")   "<<"NodePosition: ("<<nodeA->getPositionX()<<", "<<nodeA->getPositionY()<<")  ("<<nodeB->getPositionX()<<", "<<nodeB->getPositionY()<<")"<<std::endl;
         
+        if(nodeA->getName() == "Line" || nodeB->getName() == "Line")
+        {
+            return;
+        }
+        if(nodeA->getName() == "Enemy" || nodeB->getName() == "Enemy")
+        {
+            return;
+        }
+        
         if(nodeA->getName() == "Character" || nodeB->getName() == "Character")
         {
             
@@ -379,12 +434,13 @@ bool GameScene::initWithPhysics()
                     contactPoint = nodeB->getPosition();
                 }
                 
-                mainPolygon.addBeginPoint(contactPoint, contact.getContactData()->normal);
+                this->lastPoint = contactPoint;
+                
+                mainPolygon.addBeginPoint(this->lastPoint, contact.getContactData()->normal);
                 
                 mainPolygon.printPoints();
                 
                 _isDrawing = true;
-                
                 
                 
                 
@@ -466,8 +522,19 @@ void GameScene::update(float dt)
         character_move = false;
     }
     _time++;
-    if(_isDrawing && (_time >= 5))
+    if(_isDrawing)
     {
+        if(currentLine != nullptr)
+        {
+            currentLine->removeFromParent();
+        }
+        currentLine = Node::create();
+        auto linebody = PhysicsBody::createEdgeSegment(lastPoint, this->character->getPosition());
+        linebody->setContactTestBitmask(true);
+        currentLine->setName("Line");
+        currentLine->setPhysicsBody(linebody);
+        addChild(currentLine);
+        
         canvas->begin();
         character->visit();
         canvas->end();
@@ -483,7 +550,15 @@ void GameScene::update(float dt)
                 {
                     character->getPhysicsBody()->setVelocity(Vec2::ZERO);
                     SecList.push_back(character->getPosition());
+                    
+                    this->lastPoint = this->character->getPosition();
+                    lineList.push_back(currentLine);
+                    currentLine = nullptr;
                 }
+                
+                
+                
+                
                 character->getPhysicsBody()->setVelocity(Vec2(-_speed,0));
                 CCLOG("SWIPED LEFT");
                 _isTouchDown = false;
@@ -497,7 +572,14 @@ void GameScene::update(float dt)
                 {
                     character->getPhysicsBody()->setVelocity(Vec2::ZERO);
                     SecList.push_back(character->getPosition());
+                    
+                    this->lastPoint = this->character->getPosition();
+                    lineList.push_back(currentLine);
+                    currentLine = nullptr;
                 }
+                
+                
+                
                 character->getPhysicsBody()->setVelocity(Vec2(_speed,0));
                 CCLOG("SWIPED RIGHT");
                 _isTouchDown = false;
@@ -511,7 +593,14 @@ void GameScene::update(float dt)
                 {
                     character->getPhysicsBody()->setVelocity(Vec2::ZERO);
                     SecList.push_back(character->getPosition());
+                    
+                    this->lastPoint = this->character->getPosition();
+                    lineList.push_back(currentLine);
+                    currentLine = nullptr;
                 }
+                
+                
+                
                 character->getPhysicsBody()->setVelocity(Vec2(0,-_speed));
                 CCLOG("SWIPED DOWN");
                 _isTouchDown = false;
@@ -525,7 +614,14 @@ void GameScene::update(float dt)
                 {
                     character->getPhysicsBody()->setVelocity(Vec2::ZERO);
                     SecList.push_back(character->getPosition());
+                    
+                    this->lastPoint = this->character->getPosition();
+                    lineList.push_back(currentLine);
+                    currentLine = nullptr;
                 }
+                
+
+                
                 character->getPhysicsBody()->setVelocity(Vec2::ZERO);
                 character->getPhysicsBody()->setVelocity(Vec2(0,_speed));
                 CCLOG("SWIPED UP");
