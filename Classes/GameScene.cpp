@@ -109,7 +109,7 @@ bool GameScene::initWithPhysics()
     SomeNode->setPhysicsBody(SomeBody);
     addChild(SomeNode);*/
     
-    auto topBorder = DrawNode::create();
+    /*auto topBorder = DrawNode::create();
     topBorder->setName("TOP");
     topBorder->setTag(-1);
     Vec2 topBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 2500), frameSize), RelativePosition::getPosition(Vec2(0, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 2500), frameSize)};
@@ -144,7 +144,7 @@ bool GameScene::initWithPhysics()
     Vec2 rightBorderVecArr[4] = {RelativePosition::getPosition(Vec2(3500, 2500), frameSize), RelativePosition::getPosition(Vec2(4000, 2500), frameSize), RelativePosition::getPosition(Vec2(4000, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 500), frameSize)};
     rightBorder->drawSolidPoly(rightBorderVecArr, 4,  Color4F(1.0f,0.0f,0.0f,1.0f));
     rightBorder->setPosition(Vec2(0, 0));
-    addChild(rightBorder);
+    addChild(rightBorder);*/
     
     
     Vec2 StartPoly[5] = {RelativePosition::getPosition(Vec2(500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 2500), frameSize) };
@@ -189,7 +189,7 @@ bool GameScene::initWithPhysics()
     character->setName("Character");
     addChild(character);
     
-    auto enemy = DrawNode::create();
+    /*auto enemy = DrawNode::create();
     enemy->setName("Enemy");
     enemy->drawSolidRect(RelativePosition::getSize(Vec2(-50, -50), frameSize), RelativePosition::getSize(Vec2(50,50),frameSize),Color4F(0.0f,0.0f,1.0f,1.0f));
     auto ebody = PhysicsBody::createCircle(1, PhysicsMaterial(0.0f, 2, 0.0f));
@@ -199,7 +199,7 @@ bool GameScene::initWithPhysics()
     enemy->setPhysicsBody(ebody);
     enemy->setPosition(Vec2(origin.x+visibleSize.width/2, origin.y+visibleSize.height/2));
     addChild(enemy);
-    enemy->getPhysicsBody()->setVelocity(Vec2(100, 100));
+    enemy->getPhysicsBody()->setVelocity(Vec2(100, 100));*/
     
     auto contactListener = EventListenerPhysicsContact::create();
     
@@ -372,8 +372,11 @@ bool GameScene::initWithPhysics()
                     }
                     lineList.clear();
                     
-                    this->currentLine->removeFromParent();
+                    if(currentLine != nullptr)
+                        this->currentLine->removeFromParent();
                     currentLine = nullptr;
+                    
+                    this->contactPoint = contactPoint;
                     
                     addChild(node);
                     
@@ -518,7 +521,7 @@ void GameScene::update(float dt)
     }
     if(character_move)
     {
-        this->character->setPosition(this->character->getPosition() + this->direction);
+        this->character->setPosition(this->contactPoint + this->direction);
         character_move = false;
     }
     _time++;

@@ -56,7 +56,7 @@ class GameScene : public cocos2d::Scene
     cocos2d::Node *currentLine;
     cocos2d::Vec2 lastPoint;
     
-    
+    cocos2d::Vec2 contactPoint;
     
     void closeScene(cocos2d::Ref* pSender);
     void createPhysicLine(Vec2 begin, Vec2 end);

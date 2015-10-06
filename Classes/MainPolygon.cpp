@@ -197,13 +197,13 @@ std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>
     
     if(!clockwise)
     {
-        normalEnd.rotate(cocos2d::Vec2::ZERO, _PI/2.0);
-        normalBegin.rotate(cocos2d::Vec2::ZERO, _PI/2.0);
+        normalEnd.rotate(cocos2d::Vec2::ZERO, 3.0*_PI/4.0);
+        normalBegin.rotate(cocos2d::Vec2::ZERO, 3.0*_PI/4.0);
     }
     else
     {
-        normalEnd.rotate(cocos2d::Vec2::ZERO, -_PI/2.0);
-        normalBegin.rotate(cocos2d::Vec2::ZERO, -_PI/2.0);
+        normalEnd.rotate(cocos2d::Vec2::ZERO, -3.0*_PI/4.0);
+        normalBegin.rotate(cocos2d::Vec2::ZERO, -3.0*_PI/4.0);
     }
     
     /*if(!newPoints.empty())
