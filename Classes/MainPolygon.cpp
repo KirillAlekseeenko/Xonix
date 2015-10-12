@@ -10,7 +10,7 @@
 
 
 const float _PI = 3.141592653589793238462643383279502884L;
-const float margin = 1;
+const float margin = 2;
 
 
 
@@ -122,7 +122,7 @@ void MainPolygon::addEndPoint(cocos2d::Vec2 &ePoint, const cocos2d::Vec2& normal
     
 }
 
-std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>& newPoints, std::vector<cocos2d::Vec2> &List, cocos2d::Vec2 &direction)
+std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>& newPoints, std::vector<cocos2d::Vec2> &List, cocos2d::Vec2 &direction, float &square)
 {
     cocos2d::Vec2 newPoints_begin = cocos2d::Vec2::ZERO;
     cocos2d::Vec2 newPoints_end = cocos2d::Vec2::ZERO;
@@ -185,11 +185,13 @@ std::vector<cocos2d::Vec2> MainPolygon::getPath(const std::vector<cocos2d::Vec2>
     
     if(square_plus > square_minus)
     {
+        square = square_minus;
         clockwise = false;
         newPolygon.insert(newPolygon.end(), shape_minus.begin(), shape_minus.end());
     }
     else
     {
+        square = square_plus;
         clockwise = true;
         newPolygon.insert(newPolygon.end(), shape_plus.begin(), shape_plus.end());
     }
@@ -381,6 +383,12 @@ void MainPolygon::printPoints()
     }while(p != mainList.begin());
     
     std::cout<<std::endl;
+}
+
+
+void MainPolygon::clear()
+{
+    mainList.clear();
 }
 
 

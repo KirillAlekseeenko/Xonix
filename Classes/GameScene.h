@@ -19,7 +19,7 @@
 #include "triangulate.h"
 #include <cmath>
 #include "MainPolygon.h"
-#include "MyDrawNode.hpp"
+#include "TransactionHandler.hpp"
 #include <stack>
 
 class GameScene : public cocos2d::Scene
@@ -41,8 +41,9 @@ class GameScene : public cocos2d::Scene
     bool PreSolve_;
     bool ContactBegin_;
     
-    float startArea;
-    float currentArea;
+    float startSquare;
+    float currentSquare;
+    float winPercentage;
     
         
     bool createPolygon_;
@@ -58,8 +59,16 @@ class GameScene : public cocos2d::Scene
     
     cocos2d::Vec2 contactPoint;
     
+    cocos2d::EventListenerTouchOneByOne *touchListener;
+    
     void closeScene(cocos2d::Ref* pSender);
     void createPhysicLine(Vec2 begin, Vec2 end);
+    void createEnemies();
+    void swipe();
+    void defeat();
+    void victory();
+    void stopScene();
+    void setSceneToDefault();
 public:
     static cocos2d::Scene* createScene(int);
     static cocos2d::Scene* createWithPhysics();

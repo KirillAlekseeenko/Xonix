@@ -13,18 +13,17 @@ USING_NS_CC;
 
 static int _currentLevel;
 
-bool _isDrawing = false;
+bool _isDrawing;
 bool _isTouchDown;
 bool _isMoving;
 float _initialTouchPos[2];
 float _currentTouchPos[2];
 int _time = 0;
-float _speed = 100;
+const float _speed = 100;
 float _swipeLength;
 const float _PI = 3.141592653589793238462643383279502884L;
-bool removing_objects = false;
-bool character_move = false;
-float rect_margin = 1;
+bool removing_objects;
+bool character_move;
 
 float margin = 1;
 
@@ -61,91 +60,74 @@ Scene* GameScene::createWithPhysics()
     }
 }
 
-bool GameScene::initWithPhysics()
+
+void GameScene::setSceneToDefault()
 {
-    if(!Scene::initWithPhysics())
+    if(Director::getInstance()->isPaused())
     {
-        return false;
+        Director::getInstance()->resume();
     }
-    
-    this->currentLine = nullptr;
-    
-    this->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
-    
-    _gameBegun = false;
-    //this->getPhysicsWorld()->setSubsteps(100);
-    //this->getPhysicsWorld()->setAutoStep(false);
-    //this->getPhysicsWorld()->step(0.1);
-    this->getPhysicsWorld()->setSubsteps(100);
-    std::cout<<"Speed: "<<this->getPhysicsWorld()->getSpeed()<<", "<<"Substeps: "<<this->getPhysicsWorld()->getSubsteps()<<", "<<
-    "UpdateRate: "<<this->getPhysicsWorld()->getUpdateRate()<<", "<<std::endl;
-    
-    Size visibleSize = Director::getInstance()->getVisibleSize();
-    Vec2 origin = Director::getInstance()->getVisibleOrigin();
-    auto frameSize = Director::getInstance()->getOpenGLView()->getFrameSize();
-    
-    this->getPhysicsWorld()->setGravity(Vec2::ZERO);
-    
-    
-    _isMoving = false;
-    
-    canvas = RenderTexture::create(visibleSize.width, visibleSize.height);
-    canvas->setPosition(Vec2(origin.x+visibleSize.width/2, origin.y+visibleSize.height/2));
-    addChild(canvas, -3);
-    
-    _swipeLength = visibleSize.width;
-    
-    
-    
     //auto closeButton = ui::Button::create("CloseNormal.png", "oseSelected.png");
     //closeButton->setPosition(Vec2::ZERO + Vec2(16,16));
     
     /*auto SomeNode = DrawNode::create();
-    Vec2 vecArr[3] = {Vec2(300, 300), Vec2(400,400), Vec2(400,300)};
-    SomeNode->drawSolidPoly(vecArr, 3, Color4F(1.0f,0.0f,0.0f,1.0f));
-    SomeNode->setPosition(100,100);
-    auto SomeBody = PhysicsBody::createPolygon(vecArr, 3, PhysicsMaterial(100.0f, 0, 0.0f));
-    SomeBody->setDynamic(false);
-    SomeNode->setPhysicsBody(SomeBody);
-    addChild(SomeNode);*/
+     Vec2 vecArr[3] = {Vec2(300, 300), Vec2(400,400), Vec2(400,300)};
+     SomeNode->drawSolidPoly(vecArr, 3, Color4F(1.0f,0.0f,0.0f,1.0f));
+     SomeNode->setPosition(100,100);
+     auto SomeBody = PhysicsBody::createPolygon(vecArr, 3, PhysicsMaterial(100.0f, 0, 0.0f));
+     SomeBody->setDynamic(false);
+     SomeNode->setPhysicsBody(SomeBody);
+     addChild(SomeNode);*/
     
     /*auto topBorder = DrawNode::create();
-    topBorder->setName("TOP");
-    topBorder->setTag(-1);
-    Vec2 topBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 2500), frameSize), RelativePosition::getPosition(Vec2(0, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 2500), frameSize)};
-    topBorder->drawSolidPoly(topBorderVecArr, 4, Color4F(1.0f,0.0f,0.0f,1.0f));
-    topBorder->setPosition(Vec2(0, 0));
-    addChild(topBorder);
+     topBorder->setName("TOP");
+     topBorder->setTag(-1);
+     Vec2 topBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 2500), frameSize), RelativePosition::getPosition(Vec2(0, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 3000), frameSize), RelativePosition::getPosition(Vec2(4000, 2500), frameSize)};
+     topBorder->drawSolidPoly(topBorderVecArr, 4, Color4F(1.0f,0.0f,0.0f,1.0f));
+     topBorder->setPosition(Vec2(0, 0));
+     addChild(topBorder);
+     
+     
+     
+     auto lowBorder = DrawNode::create();
+     lowBorder->setName("LOW");
+     lowBorder->setTag(-3);
+     Vec2 lowBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 500), frameSize), RelativePosition::getPosition(Vec2(4000, 500), frameSize), RelativePosition::getPosition(Vec2(4000, 0), frameSize), RelativePosition::getPosition(Vec2(0, 0), frameSize)};
+     lowBorder->drawSolidPoly(lowBorderVecArr, 4, Color4F(1.0f,0.0f,0.0f,1.0f));
+     lowBorder->setPosition(Vec2(0, 0));
+     addChild(lowBorder);
+     
+     
+     
+     auto leftBorder = DrawNode::create();
+     leftBorder->setName("LEFT");
+     leftBorder->setTag(-4);
+     Vec2 leftBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 500), frameSize), RelativePosition::getPosition(Vec2(0, 500), frameSize)};
+     leftBorder->drawSolidPoly(leftBorderVecArr, 4,  Color4F(1.0f,0.0f,0.0f,1.0f));
+     leftBorder->setPosition(Vec2(0, 0));
+     addChild(leftBorder);
+     
+     
+     auto rightBorder = DrawNode::create();
+     rightBorder->setName("RIGHT");
+     rightBorder->setTag(-2);
+     Vec2 rightBorderVecArr[4] = {RelativePosition::getPosition(Vec2(3500, 2500), frameSize), RelativePosition::getPosition(Vec2(4000, 2500), frameSize), RelativePosition::getPosition(Vec2(4000, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 500), frameSize)};
+     rightBorder->drawSolidPoly(rightBorderVecArr, 4,  Color4F(1.0f,0.0f,0.0f,1.0f));
+     rightBorder->setPosition(Vec2(0, 0));
+     addChild(rightBorder);*/
     
+    while(!CollisionDots::getCurrentCollision().empty())
+    {
+        CollisionDots::getCurrentCollision().pop();
+    }
     
+    auto frameSize = Director::getInstance()->getOpenGLView()->getFrameSize();
     
-    auto lowBorder = DrawNode::create();
-    lowBorder->setName("LOW");
-    lowBorder->setTag(-3);
-    Vec2 lowBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 500), frameSize), RelativePosition::getPosition(Vec2(4000, 500), frameSize), RelativePosition::getPosition(Vec2(4000, 0), frameSize), RelativePosition::getPosition(Vec2(0, 0), frameSize)};
-    lowBorder->drawSolidPoly(lowBorderVecArr, 4, Color4F(1.0f,0.0f,0.0f,1.0f));
-    lowBorder->setPosition(Vec2(0, 0));
-    addChild(lowBorder);
-
-    
-    
-    auto leftBorder = DrawNode::create();
-    leftBorder->setName("LEFT");
-    leftBorder->setTag(-4);
-    Vec2 leftBorderVecArr[4] = {RelativePosition::getPosition(Vec2(0, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 500), frameSize), RelativePosition::getPosition(Vec2(0, 500), frameSize)};
-    leftBorder->drawSolidPoly(leftBorderVecArr, 4,  Color4F(1.0f,0.0f,0.0f,1.0f));
-    leftBorder->setPosition(Vec2(0, 0));
-    addChild(leftBorder);
-
-    
-    auto rightBorder = DrawNode::create();
-    rightBorder->setName("RIGHT");
-    rightBorder->setTag(-2);
-    Vec2 rightBorderVecArr[4] = {RelativePosition::getPosition(Vec2(3500, 2500), frameSize), RelativePosition::getPosition(Vec2(4000, 2500), frameSize), RelativePosition::getPosition(Vec2(4000, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 500), frameSize)};
-    rightBorder->drawSolidPoly(rightBorderVecArr, 4,  Color4F(1.0f,0.0f,0.0f,1.0f));
-    rightBorder->setPosition(Vec2(0, 0));
-    addChild(rightBorder);*/
-    
+    _gameBegun = false;
+    _isDrawing = false;
+    removing_objects = false;
+    character_move = false;
+    _isMoving = false;
     
     Vec2 StartPoly[5] = {RelativePosition::getPosition(Vec2(500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 500), frameSize), RelativePosition::getPosition(Vec2(3500, 2500), frameSize), RelativePosition::getPosition(Vec2(500, 2500), frameSize) };
     
@@ -154,6 +136,15 @@ bool GameScene::initWithPhysics()
     mainPolygon.addPoint(StartPoly[1]);
     mainPolygon.addPoint(StartPoly[0]);
     
+    std::vector<Vec2> initial_polygon;
+    initial_polygon.push_back(StartPoly[0]);
+    initial_polygon.push_back(StartPoly[1]);
+    initial_polygon.push_back(StartPoly[2]);
+    initial_polygon.push_back(StartPoly[3]);
+    
+    startSquare = getSquare(initial_polygon);
+    currentSquare = startSquare;
+    winPercentage = 0.4;
     
     for(int i = 0;i < 4;i++)
     {
@@ -170,16 +161,101 @@ bool GameScene::initWithPhysics()
         std::cout<<"added "<< i<<endl;
     }
     
+    auto defeatMenu = this->getChildByName("DefeatMenu");
+    if(defeatMenu != nullptr)
+    {
+        defeatMenu->removeFromParent();
+    }
+
     createPolygon_ = false;
     
+    character->setPosition(RelativePosition::getPosition(Vec2(2000, 500) + Vec2(0, 1), frameSize));
+    
+    for(auto x : enemies)
+    {
+        x->setPosition(300,300);
+        x->getPhysicsBody()->setVelocity(Vec2(100, 100));
+    }
+    
+}
+
+
+bool GameScene::initWithPhysics()
+{
+    if(!Scene::initWithPhysics())
+    {
+        return false;
+    }
     
     
-    character = MyDrawNode::create();
+    
+    
+    
+    
+    this->currentLine = nullptr;
+    
+    this->getPhysicsWorld()->setDebugDrawMask(PhysicsWorld::DEBUGDRAW_ALL);
+    
+    //this->getPhysicsWorld()->setSubsteps(100);
+    //this->getPhysicsWorld()->setAutoStep(false);
+    //this->getPhysicsWorld()->step(0.1);
+    this->getPhysicsWorld()->setSubsteps(100);
+    std::cout<<"Speed: "<<this->getPhysicsWorld()->getSpeed()<<", "<<"Substeps: "<<this->getPhysicsWorld()->getSubsteps()<<", "<<
+    "UpdateRate: "<<this->getPhysicsWorld()->getUpdateRate()<<", "<<std::endl;
+    
+    Size visibleSize = Director::getInstance()->getVisibleSize();
+    Vec2 origin = Director::getInstance()->getVisibleOrigin();
+    auto frameSize = Director::getInstance()->getOpenGLView()->getFrameSize();
+    
+    this->getPhysicsWorld()->setGravity(Vec2::ZERO);
+    
+    
+    
+    
+    canvas = RenderTexture::create(visibleSize.width, visibleSize.height);
+    canvas->setPosition(Vec2(origin.x+visibleSize.width/2, origin.y+visibleSize.height/2));
+    addChild(canvas, -3);
+    
+    _swipeLength = 300;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    character = DrawNode::create();
     character->drawSolidRect(RelativePosition::getSize(Vec2(-50, -50), frameSize), RelativePosition::getSize(Vec2(50,50),frameSize),Color4F(0.0f,1.0f,0.0f,1.0f));
     
     
+    auto enemy = DrawNode::create();
+    enemy->setName("Enemy");
+    enemy->drawSolidRect(RelativePosition::getSize(Vec2(-50, -50), frameSize), RelativePosition::getSize(Vec2(50,50),frameSize),Color4F(0.0f,0.0f,1.0f,1.0f));
+    auto ebody = PhysicsBody::createCircle(1, PhysicsMaterial(0.0f, 2, 0.0f));
+    ebody->setDynamic(true);
+    ebody->setContactTestBitmask(true);
+    ebody->setRotationEnable(false);
+    enemy->setPhysicsBody(ebody);
+    addChild(enemy);
+    enemies.push_back(enemy);
+
+    
+    
+    setSceneToDefault();
+    
+    
+    
     //character = Sprite::create("Character.png");
-    character->setPosition(RelativePosition::getPosition(Vec2(2000, 500), frameSize));
+    //character->setPosition(RelativePosition::getPosition(Vec2(2000, 500) + Vec2(0, 1), frameSize));
     //auto cbody = PhysicsBody::createBox(RelativePosition::getSize(Size(2,2), frameSize),PhysicsMaterial(100.0f, 0, 0.0f));
     auto cbody = PhysicsBody::createCircle(1, PhysicsMaterial(100.0f, 0, 0.0f));
     cbody->setContactTestBitmask(true);
@@ -189,22 +265,11 @@ bool GameScene::initWithPhysics()
     character->setName("Character");
     addChild(character);
     
-    /*auto enemy = DrawNode::create();
-    enemy->setName("Enemy");
-    enemy->drawSolidRect(RelativePosition::getSize(Vec2(-50, -50), frameSize), RelativePosition::getSize(Vec2(50,50),frameSize),Color4F(0.0f,0.0f,1.0f,1.0f));
-    auto ebody = PhysicsBody::createCircle(1, PhysicsMaterial(0.0f, 2, 0.0f));
-    ebody->setDynamic(true);
-    ebody->setContactTestBitmask(true);
-    ebody->setRotationEnable(false);
-    enemy->setPhysicsBody(ebody);
-    enemy->setPosition(Vec2(origin.x+visibleSize.width/2, origin.y+visibleSize.height/2));
-    addChild(enemy);
-    enemy->getPhysicsBody()->setVelocity(Vec2(100, 100));*/
+    
     
     auto contactListener = EventListenerPhysicsContact::create();
     
-    
-    
+
     
     contactListener->onContactBegin = [this, frameSize](PhysicsContact& contact)
     {
@@ -217,9 +282,8 @@ bool GameScene::initWithPhysics()
         
         if((nodeA->getName() == "Enemy" && nodeB->getName() == "Line") || (nodeB->getName() == "Enemy" && nodeA->getName() == "Line"))
         {
-            MessageBox("","GAGARIN HUY!");
-            Director::getInstance()->stopAnimation();
-            return true;
+            this->defeat();
+            //DEFEAT
         }
         
         if(nodeA->getName() == "Line" || nodeB->getName() == "Line")
@@ -272,9 +336,12 @@ bool GameScene::initWithPhysics()
                     
                     std::vector<Vec2> polygon;
                     
+                    float square;
                     
                     try{
-                        polygon = mainPolygon.getPath(SecList, mainList, this->direction);
+                        polygon = mainPolygon.getPath(SecList, mainList, this->direction, square);
+                        currentSquare -= square;
+                        
                         
                     }
                     catch(BeginEndException)
@@ -283,6 +350,13 @@ bool GameScene::initWithPhysics()
                         cout<<"BeginEndError";
                         return false;
                     }
+                    
+                    if(currentSquare / startSquare < winPercentage)
+                    {
+                        this->victory();
+                    }
+                    
+                
                     std::cout<<"\nPolygonBeforeTriagonalization: ";
                     for(auto x : polygon)
                     {
@@ -312,7 +386,7 @@ bool GameScene::initWithPhysics()
                     
                     std::cout<<"Indices: ";
                     
-                    for(int i = 0;i < indices.size();i+=3)
+                    /*for(int i = 0;i < indices.size();i+=3)
                     {
                         std::cout<<"("<<polygon[indices[i]].x<<", "<<polygon[indices[i]].y<<") <->";
                         std::cout<<"("<<polygon[indices[i+1]].x<<", "<<polygon[indices[i+1]].y<<") <->";
@@ -320,16 +394,8 @@ bool GameScene::initWithPhysics()
                         std::cout<<" ***** ";
                         node->drawTriangle(polygon[indices[i]], polygon[indices[i+1]], polygon[indices[i+2]], Color4F::GREEN);
                         
-                    }
+                    }*/
                     
-                    /*Vec2 *polygon_ = new Vec2[polygon.size()];
-                    int ii = 0;
-                    for(auto x : polygon)
-                    {
-                        polygon_[ii] = x;
-                        ii++;
-                    }
-                    auto body = PhysicsBody::createPolygon(polygon_, polygon.size(), PhysicsMaterial(100.0f, 0, 0.0f));*/
                     
                     removing_objects = true;
                     
@@ -378,7 +444,7 @@ bool GameScene::initWithPhysics()
                     
                     this->contactPoint = contactPoint;
                     
-                    addChild(node);
+                    //addChild(node);
                     
                     return true;
                     
@@ -459,11 +525,12 @@ bool GameScene::initWithPhysics()
     
     
     
-    auto listener1 = EventListenerTouchOneByOne::create();
+    touchListener = EventListenerTouchOneByOne::create();
     
-    listener1->setSwallowTouches(true);
     
-    listener1->onTouchBegan = [](Touch* touch, Event* event){
+    touchListener->setSwallowTouches(true);
+    
+    touchListener->onTouchBegan = [](Touch* touch, Event* event){
         if(!_isMoving)
         _isMoving = true;
         _initialTouchPos[0] = touch->getLocation().x;
@@ -476,20 +543,20 @@ bool GameScene::initWithPhysics()
         return true;
     };
     
-    listener1->onTouchMoved = [](Touch* touch, Event* event){
+    touchListener->onTouchMoved = [](Touch* touch, Event* event){
         _currentTouchPos[0] = touch->getLocation().x;
         _currentTouchPos[1] = touch->getLocation().y;
     };
     
-    listener1->onTouchEnded = [=](Touch* touch, Event* event){
+    touchListener->onTouchEnded = [=](Touch* touch, Event* event){
         _isTouchDown = false;
     };
     
-    listener1->onTouchCancelled = [=](Touch* touch, Event* event){
+    touchListener->onTouchCancelled = [=](Touch* touch, Event* event){
         _isTouchDown = false;
     };
     
-    _eventDispatcher->addEventListenerWithSceneGraphPriority(listener1, this);
+    _eventDispatcher->addEventListenerWithSceneGraphPriority(touchListener, this);
     _eventDispatcher->addEventListenerWithSceneGraphPriority(contactListener, this);
     
     _isTouchDown = false;
@@ -498,6 +565,7 @@ bool GameScene::initWithPhysics()
     _initialTouchPos[1] = 0;
     
     this->scheduleUpdate();
+    
     
     return true;
 }
@@ -509,6 +577,7 @@ void GameScene::update(float dt)
         //this->character->getPhysicsBody()->setVelocity(Vec2(0, 3));
         
         std::cout<<"\nDIRECTION: ("<<this->direction.x<<", "<<this->direction.y<<")\n";
+        this->character->getPhysicsBody()->setVelocity(Vec2::ZERO);
         while(!physicsStack.empty())
         {
             auto nn = this->getChildByTag(physicsStack.top());
@@ -633,5 +702,119 @@ void GameScene::update(float dt)
         }
     }
 }
+
+void GameScene::stopScene()
+{
+    this->character->getPhysicsBody()->setVelocity(Vec2::ZERO);
+    for(auto x : enemies)
+    {
+        x->getPhysicsBody()->setVelocity(Vec2::ZERO);
+    }
+}
+
+
+
+
+void GameScene::defeat()
+{
+    
+    stopScene();
+    Director::getInstance()->pause();
+    
+    this->touchListener->setEnabled(false);
+    cocos2d::Vector<MenuItem*> menuItems;
+    
+    
+    
+    auto tryagainLabel = Label::createWithTTF("Try again", "fonts/Marker Felt.ttf", 64);
+    auto tryagainItem = MenuItemLabel::create(tryagainLabel, [this](cocos2d::Ref* pSender)
+    {
+        this->unscheduleAllCallbacks();
+        this->canvas->clear(0, 0, 0, 0);
+        for(auto x : enemies)
+        {
+            x->removeFromParent();
+        }
+        enemies.clear();
+        mainPolygon.clear();
+        SecList.clear();
+        
+        for(auto x : lineList)
+        {
+            x->removeFromParent();
+        }
+        lineList.clear();
+        
+        if(currentLine != nullptr)
+        {
+            currentLine->removeFromParent();
+            currentLine = nullptr;
+        }
+        
+        
+        setSceneToDefault();
+        
+        
+    });
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    auto visibleOrigin = Director::getInstance()->getVisibleOrigin();
+    tryagainItem->setPosition(visibleOrigin.x + visibleSize.width / 2, visibleOrigin.y + visibleSize.height / 2 + 100);
+    
+    auto backtomenuLabel = Label::createWithTTF("Back to menu", "fonts/Marker Felt.ttf", 64);
+    auto backtomenuItem = MenuItemLabel::create(backtomenuLabel, [this](cocos2d::Ref* pSender)
+    {
+        this->unscheduleAllCallbacks();
+        TransactionHandler::popScene();
+    });
+    backtomenuItem->setPosition(visibleOrigin.x + visibleSize.width / 2, visibleOrigin.y + visibleSize.height / 2 - 100);
+
+    
+    menuItems.pushBack(tryagainItem);
+    menuItems.pushBack(backtomenuItem);
+    
+    auto menu = Menu::createWithArray(menuItems);
+    menu->setName("DefeatMenu");
+    
+    menu->setPosition(Vec2::ZERO);
+    
+    addChild(menu,20);
+    
+    
+}
+
+void GameScene::victory()
+{
+    stopScene();
+    Director::getInstance()->pause();
+    
+    this->touchListener->setEnabled(false);
+    cocos2d::Vector<MenuItem*> menuItems;
+    
+    
+    auto visibleSize = Director::getInstance()->getVisibleSize();
+    auto visibleOrigin = Director::getInstance()->getVisibleOrigin();
+    
+    auto backtomenuLabel = Label::createWithTTF("Back to menu", "fonts/Marker Felt.ttf", 64);
+    auto backtomenuItem = MenuItemLabel::create(backtomenuLabel, [this](cocos2d::Ref* pSender)
+                                                {
+                                                    this->unscheduleAllCallbacks();
+                                                    TransactionHandler::popScene();
+                                                });
+    backtomenuItem->setPosition(visibleOrigin.x + visibleSize.width / 2, visibleOrigin.y + visibleSize.height / 2 - 100);
+    
+    
+    menuItems.pushBack(backtomenuItem);
+    
+    auto menu = Menu::createWithArray(menuItems);
+    menu->setPosition(Vec2::ZERO);
+    
+    addChild(menu,20);
+}
+
+
+
+
+
+
 
 

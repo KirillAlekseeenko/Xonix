@@ -3,9 +3,11 @@
 
 #include "cocos2d.h"
 #include "GameScene.h"
+#include "TransactionHandler.hpp"
 
 class HelloWorld : public cocos2d::Layer
 {
+
 public:
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
     static cocos2d::Scene* createScene();
@@ -17,6 +19,7 @@ public:
     void menuSettingsCallback(cocos2d::Ref* pSender);
     void menuStartCallback(cocos2d::Ref* pSender);
     void menuAboutCallback(cocos2d::Ref* pSender);
+    
     
     // implement the "static create()" method manually
     CREATE_FUNC(HelloWorld);

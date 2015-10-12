@@ -27,6 +27,7 @@ bool HelloWorld::init()
     {
         return false;
     }
+    std::cout<<"INIT HELLO WORLD\n";
     
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Vec2 origin = Director::getInstance()->getVisibleOrigin();
@@ -59,6 +60,7 @@ bool HelloWorld::init()
     this->addChild(menuExample, 1);
     
     
+    
     return true;
 }
 
@@ -79,6 +81,7 @@ void HelloWorld::menuAboutCallback(cocos2d::Ref* pSender)
 {
     std::cout<<"About\n";
 }
+
 
 
 

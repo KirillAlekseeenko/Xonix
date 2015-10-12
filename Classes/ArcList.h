@@ -41,6 +41,7 @@ public:
     void print(Unit *begin, Unit *end);
     void Array(Unit *begin, Unit *end, std::vector<cocos2d::Vec2> &vec);
     void make_straight();
+    void clear();
     Unit *end(){return _end;}
     Unit *begin(){return _begin;}
 };

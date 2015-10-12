@@ -195,3 +195,24 @@ void CircularList::make_straight()
     }while(ptr != _begin);
 }
 
+void CircularList::clear()
+{
+    Unit *p = this->_end;
+    Unit *p_;
+    this->_begin->prev = nullptr;
+    while(p != nullptr)
+    {
+        p_ = p;
+        p = p->prev;
+        delete p_;
+    }
+}
+
+
+
+
+
+
+
+
+
