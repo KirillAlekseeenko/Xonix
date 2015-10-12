@@ -19,7 +19,6 @@
 #include "triangulate.h"
 #include <cmath>
 #include "MainPolygon.h"
-#include "TransactionHandler.hpp"
 #include <stack>
 
 class GameScene : public cocos2d::Scene

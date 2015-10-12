@@ -16,6 +16,7 @@ class TransactionHandler
 {
 public:
     static void popScene();
+    static void reloadGameScene();
 };
 
 #endif /* TransactionHandler_hpp */

@@ -7,6 +7,7 @@
 //
 
 #include "GameScene.h"
+#include "TransactionHandler.hpp"
 //#include "algorithm"
 
 USING_NS_CC;
@@ -63,22 +64,6 @@ Scene* GameScene::createWithPhysics()
 
 void GameScene::setSceneToDefault()
 {
-    if(Director::getInstance()->isPaused())
-    {
-        Director::getInstance()->resume();
-    }
-    //auto closeButton = ui::Button::create("CloseNormal.png", "oseSelected.png");
-    //closeButton->setPosition(Vec2::ZERO + Vec2(16,16));
-    
-    /*auto SomeNode = DrawNode::create();
-     Vec2 vecArr[3] = {Vec2(300, 300), Vec2(400,400), Vec2(400,300)};
-     SomeNode->drawSolidPoly(vecArr, 3, Color4F(1.0f,0.0f,0.0f,1.0f));
-     SomeNode->setPosition(100,100);
-     auto SomeBody = PhysicsBody::createPolygon(vecArr, 3, PhysicsMaterial(100.0f, 0, 0.0f));
-     SomeBody->setDynamic(false);
-     SomeNode->setPhysicsBody(SomeBody);
-     addChild(SomeNode);*/
-    
     /*auto topBorder = DrawNode::create();
      topBorder->setName("TOP");
      topBorder->setTag(-1);
@@ -730,29 +715,7 @@ void GameScene::defeat()
     auto tryagainItem = MenuItemLabel::create(tryagainLabel, [this](cocos2d::Ref* pSender)
     {
         this->unscheduleAllCallbacks();
-        this->canvas->clear(0, 0, 0, 0);
-        for(auto x : enemies)
-        {
-            x->removeFromParent();
-        }
-        enemies.clear();
-        mainPolygon.clear();
-        SecList.clear();
-        
-        for(auto x : lineList)
-        {
-            x->removeFromParent();
-        }
-        lineList.clear();
-        
-        if(currentLine != nullptr)
-        {
-            currentLine->removeFromParent();
-            currentLine = nullptr;
-        }
-        
-        
-        setSceneToDefault();
+        TransactionHandler::reloadGameScene();
         
         
     });
