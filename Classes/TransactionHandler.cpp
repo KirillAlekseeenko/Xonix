@@ -28,3 +28,13 @@ void TransactionHandler::reloadGameScene()
     cocos2d::Director::getInstance()->resume();
     
 }
+
+void TransactionHandler::loadLevel(int level)
+{
+    if(!cocos2d::Director::getInstance()->isPaused())
+        cocos2d::Director::getInstance()->pause();
+    cocos2d::Director::getInstance()->popScene();
+    cocos2d::Director::getInstance()->pushScene(GameScene::createScene(level));
+    cocos2d::Director::getInstance()->resume();
+
+}

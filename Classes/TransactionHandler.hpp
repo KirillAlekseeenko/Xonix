@@ -17,6 +17,7 @@ class TransactionHandler
 public:
     static void popScene();
     static void reloadGameScene();
+    static void loadLevel(int level);
 };
 
 #endif /* TransactionHandler_hpp */

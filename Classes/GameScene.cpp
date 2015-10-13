@@ -12,7 +12,6 @@
 
 USING_NS_CC;
 
-static int _currentLevel;
 
 bool _isDrawing;
 bool _isTouchDown;
@@ -30,7 +29,7 @@ float margin = 1;
 
 
 
-
+int GameScene::_currentLevel;
 
 
 
@@ -41,9 +40,9 @@ float margin = 1;
 
 Scene* GameScene::createScene(int level)
 {
+    _currentLevel = level;
     auto gamescene = GameScene::createWithPhysics();
     //GameScene::createWithPhysics();
-    _currentLevel = level;
     return gamescene;
 }
 Scene* GameScene::createWithPhysics()
@@ -101,6 +100,11 @@ void GameScene::setSceneToDefault()
      rightBorder->setPosition(Vec2(0, 0));
      addChild(rightBorder);*/
     
+    
+    
+    
+    
+    
     while(!CollisionDots::getCurrentCollision().empty())
     {
         CollisionDots::getCurrentCollision().pop();
@@ -151,6 +155,12 @@ void GameScene::setSceneToDefault()
     {
         defeatMenu->removeFromParent();
     }
+    
+    
+    auto levelLabel = Label::createWithTTF("Level " + std::to_string(_currentLevel), "fonts/Marker Felt.ttf", 64);
+    levelLabel->setPosition(RelativePosition::getPosition(Vec2(1500, 2800), frameSize));
+    addChild(levelLabel);
+    
 
     createPolygon_ = false;
     
@@ -715,9 +725,8 @@ void GameScene::defeat()
     auto tryagainItem = MenuItemLabel::create(tryagainLabel, [this](cocos2d::Ref* pSender)
     {
         this->unscheduleAllCallbacks();
-        TransactionHandler::reloadGameScene();
-        
-        
+        TransactionHandler::loadLevel(_currentLevel);
+    
     });
     auto visibleSize = Director::getInstance()->getVisibleSize();
     auto visibleOrigin = Director::getInstance()->getVisibleOrigin();
@@ -747,11 +756,18 @@ void GameScene::defeat()
 
 void GameScene::victory()
 {
+    auto _maxLevel = UserDefault::getInstance()->getIntegerForKey(STRING_LEVEL);
+    if(_currentLevel + 1 > _maxLevel)
+    {
+        UserDefault::getInstance()->setIntegerForKey(STRING_LEVEL, _currentLevel + 1);
+    }
+    
     stopScene();
     Director::getInstance()->pause();
     
     this->touchListener->setEnabled(false);
     cocos2d::Vector<MenuItem*> menuItems;
+
     
     
     auto visibleSize = Director::getInstance()->getVisibleSize();
@@ -761,12 +777,26 @@ void GameScene::victory()
     auto backtomenuItem = MenuItemLabel::create(backtomenuLabel, [this](cocos2d::Ref* pSender)
                                                 {
                                                     this->unscheduleAllCallbacks();
+                                                    
+                                                    
                                                     TransactionHandler::popScene();
+
                                                 });
     backtomenuItem->setPosition(visibleOrigin.x + visibleSize.width / 2, visibleOrigin.y + visibleSize.height / 2 - 100);
     
     
+    auto toNextLevelLabel = Label::createWithTTF("Next Level", "fonts/Marker Felt.ttf", 64);
+    auto toNextLevelItem = MenuItemLabel::create(toNextLevelLabel, [this](cocos2d::Ref* pSender)
+                                                {
+                                                    this->unscheduleAllCallbacks();
+                                                    
+                                                    TransactionHandler::loadLevel(_currentLevel + 1);
+                                                });
+    toNextLevelItem->setPosition(visibleOrigin.x + visibleSize.width / 2, visibleOrigin.y + visibleSize.height / 2 + 100);
+    
+    
     menuItems.pushBack(backtomenuItem);
+    menuItems.pushBack(toNextLevelItem);
     
     auto menu = Menu::createWithArray(menuItems);
     menu->setPosition(Vec2::ZERO);

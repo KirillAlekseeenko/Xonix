@@ -25,6 +25,10 @@ class GameScene : public cocos2d::Scene
 {
     bool _gameBegun;
     
+    static int _currentLevel;
+    
+    const char *STRING_LEVEL = "CURRENT_LEVEL";
+    
     DrawNode *character;
     std::vector<DrawNode*> enemies;
     
@@ -43,6 +47,7 @@ class GameScene : public cocos2d::Scene
     float startSquare;
     float currentSquare;
     float winPercentage;
+    float currentPercentage;
     
         
     bool createPolygon_;

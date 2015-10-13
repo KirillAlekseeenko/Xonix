@@ -1,5 +1,6 @@
 #include "HelloWorldScene.h"
 #include "iostream"
+#include "LevelScene.hpp"
 
 USING_NS_CC;
 
@@ -75,7 +76,7 @@ void HelloWorld::menuSettingsCallback(cocos2d::Ref* pSender)
 void HelloWorld::menuStartCallback(cocos2d::Ref* pSender)
 {
     std::cout<<"Start\n";
-    Director::getInstance()->pushScene(GameScene::createScene(4));
+    Director::getInstance()->pushScene(LevelScene::createScene());
 }
 void HelloWorld::menuAboutCallback(cocos2d::Ref* pSender)
 {
